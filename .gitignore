@@ -1,0 +1,5 @@
+venv/
+
+*.zip
+PrixCarburants_annuel_*.xml
+PrixCarburants_annuel_*.xsd
