@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="pdv_liste">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="pdv"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="pdv">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="adresse"/>
+        <xs:element ref="ville"/>
+        <xs:choice>
+          <xs:element ref="horaires"/>
+          <xs:element ref="ouverture"/>
+        </xs:choice>
+        <xs:element ref="services"/>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="fermeture"/>
+          <xs:element ref="prix"/>
+          <xs:element ref="rupture"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="cp" use="required"/>
+      <xs:attribute name="id" use="required" type="xs:integer"/>
+      <xs:attribute name="latitude" use="required"/>
+      <xs:attribute name="longitude" use="required"/>
+      <xs:attribute name="pop" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="adresse" type="xs:string"/>
+  <xs:element name="ville" type="xs:string"/>
+  <xs:element name="horaires">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jour"/>
+      </xs:sequence>
+      <xs:attribute name="automate-24-24" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="jour">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="horaire"/>
+      </xs:sequence>
+      <xs:attribute name="ferme" use="required"/>
+      <xs:attribute name="id" use="required" type="xs:integer"/>
+      <xs:attribute name="nom" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="horaire">
+    <xs:complexType>
+      <xs:attribute name="fermeture" use="required" type="xs:decimal"/>
+      <xs:attribute name="ouverture" use="required" type="xs:decimal"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ouverture">
+    <xs:complexType>
+      <xs:attribute name="debut" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="fin" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="saufjour" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="services">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="service"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="service" type="xs:string"/>
+  <xs:element name="fermeture">
+    <xs:complexType>
+      <xs:attribute name="debut"/>
+      <xs:attribute name="fin"/>
+      <xs:attribute name="type" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="prix">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:integer"/>
+      <xs:attribute name="maj"/>
+      <xs:attribute name="nom" type="xs:NCName"/>
+      <xs:attribute name="valeur" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="rupture">
+    <xs:complexType>
+      <xs:attribute name="debut"/>
+      <xs:attribute name="fin"/>
+      <xs:attribute name="id" type="xs:integer"/>
+      <xs:attribute name="nom" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
