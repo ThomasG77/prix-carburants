@@ -28,10 +28,14 @@ java -jar trang.jar PrixCarburants_annuel_20*.xml schema.xsd
 Attention, si vous utilisez la donnée instantanée (https://donnees.roulez-eco.fr/opendata/instantane), vous n'aurez pas les ruptures de carburant (constaté et remonté dans les discussions (https://www.data.gouv.fr/fr/datasets/prix-des-carburants-en-france-flux-instantane/#discussion-633af25db3442f9b2b7951ab). Il faut prendre la donnée du jour (https://donnees.roulez-eco.fr/opendata/jour).
 
 ```
+rm PrixCarburants_quotidien_*.zip PrixCarburants_quotidien_*.xml
 wget --content-disposition https://donnees.roulez-eco.fr/opendata/jour
+unzip PrixCarburants_quotidien_*.zip
+rm *.zip
+filename=$(ls *.xml)
 
 # Problème d'encoding réglé indirectement (déclaré comme ISO-9958-1 mais accent détruit quand lu avec cet encoding...)
-iconv -f iso-8859-1 -t utf-8 PrixCarburants_quotidien_20221011.xml >| PrixCarburants_quotidien_20221011_utf8.xml
+iconv -f iso-8859-1 -t utf-8 $filename >| PrixCarburants_quotidien_20221011_utf8.xml
 python reformat-prix-carburants.py PrixCarburants_quotidien_20221011_utf8.xml
 ```
 
