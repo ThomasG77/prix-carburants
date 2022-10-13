@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.22.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.20.8"></script>
+</head>
+<body>
+  <div id="vis"/>
+  <script>
+    const spec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "A simple pie chart with labels.",
+  "data": {
+    "values": [
+      {"category": "a", "value": 4},
+      {"category": "b", "value": 6},
+      {"category": "c", "value": 10},
+      {"category": "d", "value": 3},
+      {"category": "e", "value": 7},
+      {"category": "f", "value": 8}
+    ]
+  },
+  "encoding": {
+    "theta": {"field": "value", "type": "quantitative", "stack": true},
+    "color": {"field": "category", "type": "nominal", "legend": null}
+  },
+  "layer": [
+    {"mark": {"type": "arc", "outerRadius": 80, "innerRadius": 30}},
+    {
+      "mark": {"type": "text", "radius": 90},
+      "encoding": {"text": {"field": "category", "type": "nominal"}}
+    }
+  ],
+  "config": {}
+};
+    vegaEmbed("#vis", spec, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+  </script>
+</body>
+</html>

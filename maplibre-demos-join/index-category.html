@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title>Maplibre GL JS - Category from third party element</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script type="text/javascript" src="https://unpkg.com/maplibre-gl@1.15.2/dist/maplibre-gl.js"></script>
+    <script type="text/javascript" src="https://raw.githack.com/acalcutt/maplibre-gl-inspect/master/dist/maplibre-gl-inspect.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/maplibre-gl@1.15.2/dist/maplibre-gl.css">
+    <link rel="stylesheet" type="text/css" href="https://rawcdn.githack.com/acalcutt/maplibre-gl-inspect/9349f0f76d44ca94595dd1440f4429b23056c4e9/dist/maplibre-gl-inspect.css">
+    <style>
+      body {
+        margin:0;
+        padding:0;
+      }
+      #map {
+        position:absolute;
+        top:0;
+        bottom:0;
+        width:100%;
+      }
+      #features {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 50%;
+        overflow: auto;
+        background: rgba(255, 255, 255, 0.8);
+      }
+      #map canvas {
+        cursor: crosshair;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='map'></div>
+    <pre id="features"></pre>
+    <script>
+      var map = new maplibregl.Map({
+        container: 'map',
+        style: 'vector.json',
+        center: [2.6, 46],
+        zoom: 5
+      });
+
+      map.addControl(new maplibregl.NavigationControl());
+      map.addControl(new MaplibreInspect({
+        showInspectMap: false,
+        popup: new maplibregl.Popup({
+          closeButton: false,
+          closeOnClick: false
+        })
+      }));
+      var scale = new maplibregl.ScaleControl({
+        maxWidth: 80,
+        unit: 'metric'
+      });
+      map.addControl(scale);
+
+
+      third_party_url = 'http://[::]:8080/data/alert_bassins'
+      name_source = 'decoupage-administratif'
+      source_layer = 'departements'
+      function addDeptCategory() {
+
+        const matchExpression = ['match', ['get', 'region']];
+
+        categorized = {
+          "11": "rgb(123,204,102)",
+          "24": "rgb(204,102,153)",
+          "27": "rgb(102,183,204)",
+          "28": "rgb(204,196,102)",
+          "32": "rgb(166,102,204)",
+          "44": "rgb(102,204,136)",
+          "52": "rgb(204,106,102)",
+          "53": "rgb(102,127,204)",
+          "75": "rgb(157,204,102)",
+          "76": "rgb(204,102,187)",
+          "84": "rgb(102,204,191)",
+          "93": "rgb(204,161,102)",
+          "94": "rgb(132,102,204)",
+          "975": "rgb(102,204,102)",
+          "977": "rgb(204,102,132)",
+          "978": "rgb(102,162,204)",
+          "984": "rgb(191,204,102)",
+          "986": "rgb(187,102,204)",
+          "987": "rgb(102,204,157)",
+          "988": "rgb(204,127,102)",
+          "989": "rgb(102,106,204)",
+          "01": "rgb(136,204,102)",
+          "02": "rgb(204,102,166)",
+          "03": "rgb(102,196,204)",
+          "04": "rgb(204,183,102)",
+          "06": "rgb(153,102,204)"
+        }
+
+        fetch('depts.json').then(r => r.json()).then(json => {
+          // console.log(json)
+          // Calculate color values for each country based on 'hdi' value
+          for (const row of json) {
+            // Convert the range of data values to a suitable color
+            const color = categorized[row['region']];
+
+            matchExpression.push(row['code'], color);
+          }
+          // console.log(matchExpression)
+          depts_keys = json.reduce((acc, curr) => {
+              acc[curr.code] = curr.pop_tot_2022;
+              return acc;
+          }, {})
+
+          // Last value is the default, used where there is no data
+          matchExpression.push('rgba(0, 0, 0, 0)');
+          config_layer = {
+            'id': `${source_layer}_category_poly`,
+            'type': 'fill',
+            'source': name_source,
+            'source-layer': source_layer,
+            'paint': {
+              'fill-color': matchExpression
+            }
+          }
+          config_layer_line = {
+            'id': `${source_layer}_category_line`,
+            'type': 'line',
+            'source': name_source,
+            'source-layer': source_layer,
+            'layout': {
+              'line-cap': 'round',
+              'line-join': 'round'
+            },
+            'paint': {
+              'line-opacity': 0.6,
+              'line-color': 'rgb(180,180,180)',
+              'line-width': 0.1
+            }
+          }
+          map.addLayer(config_layer);
+          map.addLayer(config_layer_line);
+        })
+        
+      }
+      map.on('style.load', addDeptCategory);
+
+      map.on('mousemove', function (e) {
+        var features = map.queryRenderedFeatures(e.point, {
+          layers: ['departements_category_poly']
+        });
+         
+        // Limit the number of properties we're displaying for
+        // legibility and performance
+        var displayProperties = [
+          'type',
+          'properties',
+          'id',
+          'layer'
+        ];
+         
+        var displayFeatures = features.map(function (feat) {
+          var displayFeat = {};
+            displayProperties.forEach(function (prop) {
+              if (prop == 'properties' && feat[prop].code) {
+                feat[prop].pop = depts_keys[feat[prop].code]
+              }
+              displayFeat[prop] = feat[prop];
+            });
+            return displayFeat;
+        });
+         
+        document.getElementById('features').innerHTML = JSON.stringify(
+          displayFeatures,
+          null,
+          2
+        );
+      });
+
+    </script>
+  </body>
+</html>
