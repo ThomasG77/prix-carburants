@@ -65,6 +65,10 @@ INFO: Open of `carburants.gpkg'
 
 - rattachement station avec nom et autres informations de contact
 - check en comparant à adresse
+- beaucoup de stations n'ont pas de prix. Elles sont vraisemblablement fermée?!
+  `jq -c '.features[] | select(.properties.prix | length == 0)' stations_with_info.geojson`
+  vs
+  `jq -c '.features[] | select(.properties.prix | length > 0)' stations_with_info.geojson`
 - certaines données sont mal géolocalisées: hors de France (voir remontée perso sur https://www.data.gouv.fr/fr/datasets/prix-des-carburants-en-france-flux-instantane/#discussion-634311f440cddf4700d4ec76 mais je n'ai pas testé tous les cas seul les plus évidents en terme de coordonnées)
 - disparitions stations surtout sur anciennes années?
 - cas foireux sur les ouvertures (exemple https://map.bp.com/fr-FR/FR/station-essence/cergy/bp-cergy-st-christophe/820954193 vs ROND POINT DES CHENES (BD DE LOISE) CERGY ou pas même horaire le samedi)
